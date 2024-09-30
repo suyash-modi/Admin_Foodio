@@ -15,10 +15,16 @@ class PendingOrderAdapter(
     private val costumerName: MutableList<String>,
     private val ItemQuantities: MutableList<String>,
     private val foodImages: MutableList<String>,
-   // private var itemClicked : MutableList<String>
+    private val itemClicked : OnItemClicked,
 
 ) :
     RecyclerView.Adapter<PendingOrderAdapter.cartViewHolder>() {
+
+    interface OnItemClicked {
+        fun onItemClicked(position: Int)
+        fun onItemAcceptClickListener(position: Int)
+        fun onItemDispatchClickListener(position: Int)
+    }
 
     private val itemQuantities = IntArray(costumerName.size) { 1 }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): cartViewHolder {
@@ -58,14 +64,19 @@ class PendingOrderAdapter(
                             costumerName.removeAt(adapterPosition)
                             notifyItemRemoved(adapterPosition)
                             showToast("Order Dispatched")
+                            itemClicked.onItemDispatchClickListener(position)
 
                         } else {
                             text = "Dispatch"
                             showToast("Order Accepted")
                             isAccepteed = true
+                            itemClicked.onItemAcceptClickListener(position)
                         }
 
                     }
+                }
+                itemView.setOnClickListener {
+                    itemClicked.onItemClicked(adapterPosition)
                 }
             }
         }
